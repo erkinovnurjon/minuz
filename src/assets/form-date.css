@@ -1,0 +1,99 @@
+.my-custom-date {
+  border: none !important;
+  outline: none;
+  background-color: rgba(255, 255, 255, 0);
+  margin-bottom: 8px;
+  padding-left: 16px;
+  width: 100%;
+}
+.my-custom-date::-moz-placeholder {
+  color: #A7BBBD;
+}
+.my-custom-date::placeholder {
+  color: #A7BBBD;
+}
+
+.my-datepicker {
+  display: grid;
+  border-radius: 4px;
+  width: 100%;
+  margin-top: 0px;
+  padding-top: 5px;
+  background-color: #fff;
+  height: auto;
+  position: relative;
+}
+.my-datepicker .right-addon-icon {
+  position: absolute;
+  display: flex;
+  top: 0;
+  height: 100%;
+  align-items: center;
+  right: 15px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.my-datepicker label {
+  width: 100%;
+  padding-left: 16px;
+  padding-top: 2px;
+  padding-bottom: -10px;
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.48);
+  z-index: 1;
+}
+.my-datepicker .no-label {
+  padding-top: 12px;
+  padding-bottom: 8px;
+}
+.my-datepicker .no-label .input-color-label {
+  display: none;
+}
+.my-datepicker .mx-datepicker {
+  width: 100%;
+  outline: none;
+  border: none;
+  background-color: #fff;
+  padding-bottom: -10px;
+  font-size: 13px;
+  border-radius: 12px;
+}
+.my-datepicker .mx-datepicker .mx-input {
+  height: 30px !important;
+}
+.my-datepicker .mx-datepicker input {
+  padding-bottom: -7px;
+}
+.my-datepicker .mx-datepicker::-moz-placeholder {
+  color: #A7BBBD;
+}
+.my-datepicker .mx-datepicker::placeholder {
+  color: #A7BBBD;
+}
+
+.my-datepicker.my-datepicker-disabled {
+  background-color: #F4F4F4;
+  border: 1px solid #d8d6de;
+}
+.my-datepicker.my-datepicker-disabled .mx-datepicker {
+  cursor: not-allowed;
+  background-color: #F4F4F4;
+}
+
+.uppercase-text input {
+  text-transform: uppercase;
+}
+
+.my-bg-white {
+  background-color: white;
+}
+.my-bg-white .mx-datepicker {
+  background-color: white;
+}
+
+.my-bg-secondary {
+  background-color: #f7f7f7;
+}
+.my-bg-secondary .mx-datepicker {
+  background-color: #f7f7f7;
+}/*# sourceMappingURL=form-date.css.map */

@@ -1,0 +1,17 @@
+/*================================================================================
+
+NOTE:
+------
+PLACE HERE YOUR OWN SCSS CODES AND IF NEEDED, OVERRIDE THE STYLES FROM THE OTHER STYLESHEETS.
+WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BETTER LIKE THIS.  */
+.table thead th, .table tfoot th {
+  text-transform: unset !important;
+}
+
+tr.bottom-color-red td {
+  border-bottom: 2px solid red !important;
+}
+
+.vs__search, input {
+  text-overflow: ellipsis;
+}/*# sourceMappingURL=style.css.map */
