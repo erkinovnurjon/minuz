@@ -4,19 +4,30 @@
       <b-col sm="12" md="12" lg="12">
         <b-card>
           <b-row>
-            <b-col sm="12" md="6">
+            <b-col sm="12" md="4" lg="4">
               <div class="form-group">
-                <label class="col-form-label" for>{{ $t("bankName") }}</label>
+                <label class="col-form-label" for>{{ $t("oked") }}</label>
+                <b-input-group>
+                  <b-form-input
+                    :placeholder="$t('oked')"
+                    v-model="Data.IfutName"
+                  />
+                </b-input-group>
+              </div>
+            </b-col>
+            <b-col sm="12" md="4" lg="4">
+              <div class="form-group">
+                <label class="col-form-label" for>{{ $t("shortname") }}</label>
                 <div>
                   <b-input-group>
                     <b-form-input
-                      :placeholder="$t('bankName')"
-                      v-model="Bank.bankName"
+                      :placeholder="$t('shortname')"
+                      v-model="Data.shortname"
                     />
                     <b-input-group-append>
                       <b-button
                         variant="primary"
-                        @click="OpenTranslateModal('bankName')"
+                        @click="OpenTranslateModal('shortname')"
                       >
                         <feather-icon icon="GlobeIcon"></feather-icon>
                       </b-button>
@@ -25,26 +36,40 @@
                 </div>
               </div>
             </b-col>
-            <b-col sm="12" md="6">
+            <b-col sm="12" md="4" lg="4">
               <div class="form-group">
-                <label class="col-form-label" for>{{ $t("bankCode") }}</label>
+                <label class="col-form-label" for>{{ $t("fullname") }}</label>
                 <div>
                   <b-input-group>
                     <b-form-input
-                      :placeholder="$t('bankCode')"
+                      :placeholder="$t('fullname')"
                       type="number"
-                      v-model="Bank.bankCode"
+                      v-model="Data.fullname"
                     />
                     <b-input-group-append>
                       <b-button
                         variant="primary"
-                        @click="OpenTranslateModal('bankCode')"
+                        @click="OpenTranslateModal('fullname')"
                       >
                         <feather-icon icon="GlobeIcon"></feather-icon>
                       </b-button>
                     </b-input-group-append>
                   </b-input-group>
                 </div>
+              </div>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col v-if="Data.id !== 0" sm="12" md="4" lg="4">
+              <div class="form-group">
+                <v-select
+                  :label="$t('stateId')"
+                  :options="StateList"
+                  :placeholder="$t('ChooseBelow')"
+                  v-model="Data.stateId"
+                  required
+                  type="select"
+                />
               </div>
             </b-col>
           </b-row>
@@ -139,7 +164,7 @@ import {
   BTr,
   BTd,
 } from "bootstrap-vue";
-import BankService from "../../../services/info/bank.service";
+import OkedService from "../../../services/info/oked.service";
 import ManualService from "../../../services/manual.service";
 import ToastificationContent from "@core/components/toastification/ToastificationContent.vue";
 export default {
@@ -169,7 +194,27 @@ export default {
   data() {
     return {
       show: false,
-      Bank: {},
+      Data: {},
+      fieldsConditionsForApplyStudentResidence: [
+        {
+          key: "index",
+          label: this.$t("ordercode"),
+        },
+        {
+          key: "conditionType",
+          label: this.$t("conditiontype"),
+        },
+        {
+          key: "conditionValue",
+          label: this.$t("conditionInfo"),
+        },
+        {
+          key: "actions",
+          thClass: "text-right",
+          widht: "23px",
+          label: this.$t("actions"),
+        },
+      ],
       filter: {},
       TranslateModal: false,
       TranslateFields: [
@@ -202,9 +247,20 @@ export default {
   props: {},
   created() {
     this.lang = localStorage.getItem("locale") || "ru";
-    BankService.Get(this.$route.params.id).then((res) => {
-      this.show = false;
-      this.Bank = res.data;
+    OkedService.Get(this.$route.params.id)
+      .then((res) => {
+        this.loading = false;
+        this.Data = res.data;
+        if (this.$route.params.id == 0) {
+          this.Data.stateId = null;
+        }
+      })
+      .catch((error) => {
+        this.makeToast(error.response.data);
+        this.loading = false;
+      });
+    ManualService.StateSelectList().then((res) => {
+      this.StateList = res.data;
     });
     ManualService.LanguageSelectList().then((res) => {
       this.LanguageList = res.data;
@@ -213,21 +269,21 @@ export default {
   methods: {
     check() {
       if (
-        this.Bank.bankName === 0 ||
-        this.Bank.bankName === null ||
-        this.Bank.bankName === undefined ||
-        this.Bank.bankName === ""
+        this.Ifut.IfutName === 0 ||
+        this.Ifut.IfutName === null ||
+        this.Ifut.IfutName === undefined ||
+        this.Ifut.IfutName === ""
       ) {
-        this.makeToast(this.$t("bankNameNotCorrect"), "danger");
+        this.makeToast(this.$t("IfutNameNotCorrect"), "danger");
         return false;
       }
       if (
-        this.Bank.bankCode === 0 ||
-        this.Bank.bankCode === null ||
-        this.Bank.bankCode === undefined ||
-        this.Bank.bankCode === ""
+        this.Ifut.IfutCode === 0 ||
+        this.Ifut.IfutCode === null ||
+        this.Ifut.IfutCode === undefined ||
+        this.Ifut.IfutCode === ""
       ) {
-        this.makeToast(this.$t("bankCodeNotCorrect"), "danger");
+        this.makeToast(this.$t("IfutCodeNotCorrect"), "danger");
         return false;
       }
       return true;
@@ -260,7 +316,7 @@ export default {
         return false;
       }
       if (
-        this.Bank.translates.filter(
+        this.Data.translates.filter(
           (item) =>
             // eslint-disable-next-line implicit-arrow-linebreak
             item.languageId === this.TranslateItem.languageId &&
@@ -270,7 +326,7 @@ export default {
         this.makeToast(this.$t("AlreadySelectLang"), "danger");
         return false;
       }
-      this.Bank.translates.push(this.TranslateItem);
+      this.Data.translates.push(this.TranslateItem);
       this.GetTranslateItems(this.TranslateItem.columnname);
       this.clearLangTable(this.TranslateItem.columnname);
     },
@@ -280,7 +336,7 @@ export default {
       this.clearLangTable(columnname);
     },
     GetTranslateItems(columnname) {
-      this.TranslateItems = this.Bank.translates.filter(
+      this.TranslateItems = this.Data.translates.filter(
         (item) => item.columnname == columnname
       );
     },
@@ -298,10 +354,10 @@ export default {
       if (item.Status === 3) return "d-none";
     },
     SaveData() {
-      BankService.Update(this.Bank)
+      OkedService.Update(this.Data)
         .then((res) => {
           this.makeToast(this.$t("SaveSuccess"), "success");
-          this.$router.push({ name: "bank" });
+          this.$router.push({ name: "ifut" });
         })
         .catch((err) => {
           this.makeToast(this.$t(err), "danger");

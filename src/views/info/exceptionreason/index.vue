@@ -11,7 +11,7 @@
             <b-button
               style="margin-left: 10px"
               variant="primary"
-              :to="{ name: 'EditCountry', params: { id: 0 } }"
+              :to="{ name: 'Editexceptionreason', params: { id: 0 } }"
             >
               <i class="uil uil-plus"></i> {{ $t("Add") }}
             </b-button>
@@ -65,7 +65,7 @@
               <b-link
                 :id="'tooltip-edit' + item.id"
                 style="margin-right: 5px"
-                :to="{ name: 'EditCountry', params: { id: item.id } }"
+                :to="{ name: 'Editexceptionreason', params: { id: item.id } }"
                 v-b-tooltip.hover.top="$t('edit')"
               >
                 <feather-icon icon="EditIcon"></feather-icon>
@@ -160,7 +160,7 @@
 </template>
 
 <script>
-import CountryService from "@/services/info/country.service";
+import ExceptionReasonService from "@/services/info/exceptionreason.service";
 
 import {
   BButton,
@@ -231,8 +231,8 @@ export default {
           sortable: true,
         },
         {
-          key: "textCode",
-          label: this.$t("textCode"),
+          key: "shortName",
+          label: this.$t("shortName"),
           thClass: "text-center",
           tdClass: "text-center",
           sortable: true,
@@ -241,6 +241,14 @@ export default {
           key: "fullName",
           label: this.$t("fullName"),
           thClass: "text-center",
+          tdClass: "text-center",
+          sortable: true,
+        },
+        {
+          key: "details",
+          label: this.$t("Detail"),
+          thClass: "text-center",
+          tdClass: "text-center",
           sortable: true,
         },
         {
@@ -280,9 +288,6 @@ export default {
     this.Refresh();
   },
   methods: {
-    EditItem() {
-      this.$store.state.BankFilter = this.filter;
-    },
     SortChange(data) {
       this.filter.sortBy = data.sortBy;
       this.filter.orderType = data.sortDesc ? "desc" : "asc";
@@ -290,7 +295,7 @@ export default {
     },
     Delete(item) {
       this.DeleteLoading = true;
-      CountryService.Delete(item.id)
+      ExceptionReasonService.Delete(item.id)
         .then((res) => {
           this.DeleteLoading = false;
           this.Refresh();
@@ -307,11 +312,11 @@ export default {
     },
     Edit(item) {
       this.$store.state.BankFilter = this.filter;
-      this.$router.push({ path: "/info/country/edit/" + item.id });
+      this.$router.push({ path: "/info/exceptionreason/edit/" + item.id });
     },
     Refresh() {
       this.isBusy = true;
-      CountryService.GetList(this.filter).then((res) => {
+      ExceptionReasonService.GetList(this.filter).then((res) => {
         this.Data = res.data.rows;
         this.filter.totalRows = res.data.total;
         this.isBusy = false;

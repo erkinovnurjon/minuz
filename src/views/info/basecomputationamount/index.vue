@@ -11,7 +11,7 @@
             <b-button
               style="margin-left: 10px"
               variant="primary"
-              :to="{ name: 'EditCountry', params: { id: 0 } }"
+              :to="{ name: 'Editbasecomputationamount', params: { id: 0 } }"
             >
               <i class="uil uil-plus"></i> {{ $t("Add") }}
             </b-button>
@@ -65,7 +65,10 @@
               <b-link
                 :id="'tooltip-edit' + item.id"
                 style="margin-right: 5px"
-                :to="{ name: 'EditCountry', params: { id: item.id } }"
+                :to="{
+                  name: 'Editbasecomputationamount',
+                  params: { id: item.id },
+                }"
                 v-b-tooltip.hover.top="$t('edit')"
               >
                 <feather-icon icon="EditIcon"></feather-icon>
@@ -160,7 +163,7 @@
 </template>
 
 <script>
-import CountryService from "@/services/info/country.service";
+import BaseComputationAmountService from "@/services/info/basecomputationamount.service";
 
 import {
   BButton,
@@ -224,23 +227,52 @@ export default {
           sortable: true,
         },
         {
-          key: "code",
-          label: this.$t("code"),
+          key: "onDate",
+          label: this.$t("onDate"),
           thClass: "text-center",
           tdClass: "text-center",
           sortable: true,
         },
         {
-          key: "textCode",
-          label: this.$t("textCode"),
+          key: "offDate",
+          label: this.$t("offDate"),
           thClass: "text-center",
           tdClass: "text-center",
           sortable: true,
         },
         {
-          key: "fullName",
-          label: this.$t("fullName"),
+          key: "amount",
+          label: this.$t("baseAmountCount"),
           thClass: "text-center",
+          tdClass: "text-center",
+          sortable: true,
+        },
+        {
+          key: "comissionPercentage",
+          label: this.$t("comissionPercent"),
+          thClass: "text-center",
+          tdClass: "text-center",
+          sortable: true,
+        },
+        {
+          key: "comissionAmount",
+          label: this.$t("ComissionAmount"),
+          thClass: "text-center",
+          tdClass: "text-center",
+          sortable: true,
+        },
+        {
+          key: "maxComissionPercentage",
+          label: this.$t("comissionPercentMax"),
+          thClass: "text-center",
+          tdClass: "text-center",
+          sortable: true,
+        },
+        {
+          key: "maxComissionAmount",
+          label: this.$t("maxComissionAmount"),
+          thClass: "text-center",
+          tdClass: "text-center",
           sortable: true,
         },
         {
@@ -280,9 +312,6 @@ export default {
     this.Refresh();
   },
   methods: {
-    EditItem() {
-      this.$store.state.BankFilter = this.filter;
-    },
     SortChange(data) {
       this.filter.sortBy = data.sortBy;
       this.filter.orderType = data.sortDesc ? "desc" : "asc";
@@ -290,7 +319,7 @@ export default {
     },
     Delete(item) {
       this.DeleteLoading = true;
-      CountryService.Delete(item.id)
+      BaseComputationAmountService.Delete(item.id)
         .then((res) => {
           this.DeleteLoading = false;
           this.Refresh();
@@ -306,12 +335,14 @@ export default {
       this.$bvModal.show("DeleteModal" + item.id);
     },
     Edit(item) {
-      this.$store.state.BankFilter = this.filter;
-      this.$router.push({ path: "/info/country/edit/" + item.id });
+      this.$store.state.BaseCalculationAmountFilter = this.filter;
+      this.$router.push({
+        path: "/info/basecomputationamount/edit/" + item.id,
+      });
     },
     Refresh() {
       this.isBusy = true;
-      CountryService.GetList(this.filter).then((res) => {
+      BaseComputationAmountService.GetList(this.filter).then((res) => {
         this.Data = res.data.rows;
         this.filter.totalRows = res.data.total;
         this.isBusy = false;

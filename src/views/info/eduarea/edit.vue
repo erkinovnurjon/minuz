@@ -4,19 +4,32 @@
       <b-col sm="12" md="12" lg="12">
         <b-card>
           <b-row>
-            <b-col sm="12" md="6">
+            <b-col sm="12" md="4">
               <div class="form-group">
-                <label class="col-form-label" for>{{ $t("bankName") }}</label>
+                <label class="col-form-label" for>{{ $t("code") }}</label>
                 <div>
                   <b-input-group>
                     <b-form-input
-                      :placeholder="$t('bankName')"
-                      v-model="Bank.bankName"
+                      :placeholder="$t('code')"
+                      v-model="Data.code"
+                    />
+                  </b-input-group>
+                </div>
+              </div>
+            </b-col>
+            <b-col sm="12" md="4">
+              <div class="form-group">
+                <label class="col-form-label" for>{{ $t("shortName") }}</label>
+                <div>
+                  <b-input-group>
+                    <b-form-input
+                      :placeholder="$t('shortName')"
+                      v-model="Data.shortName"
                     />
                     <b-input-group-append>
                       <b-button
                         variant="primary"
-                        @click="OpenTranslateModal('bankName')"
+                        @click="OpenTranslateModal('shortName')"
                       >
                         <feather-icon icon="GlobeIcon"></feather-icon>
                       </b-button>
@@ -25,26 +38,39 @@
                 </div>
               </div>
             </b-col>
-            <b-col sm="12" md="6">
+            <b-col sm="12" md="4">
               <div class="form-group">
-                <label class="col-form-label" for>{{ $t("bankCode") }}</label>
+                <label class="col-form-label" for>{{ $t("fullname") }}</label>
                 <div>
                   <b-input-group>
                     <b-form-input
-                      :placeholder="$t('bankCode')"
-                      type="number"
-                      v-model="Bank.bankCode"
+                      :placeholder="$t('fullname')"
+                      v-model="Data.fullName"
                     />
                     <b-input-group-append>
                       <b-button
                         variant="primary"
-                        @click="OpenTranslateModal('bankCode')"
+                        @click="OpenTranslateModal('fullname')"
                       >
                         <feather-icon icon="GlobeIcon"></feather-icon>
                       </b-button>
                     </b-input-group-append>
                   </b-input-group>
                 </div>
+              </div>
+            </b-col>
+          </b-row>
+          <b-row v-if="Data.id !== 0" class="mt-2">
+            <b-col sm="12" md="4" lg="4">
+              <label class="col-form-label" for>{{ $t("state") }}</label>
+              <div class="form-group">
+                <v-select
+                  :options="StateList"
+                  :reduce="(item) => item.value"
+                  :placeholder="$t('ChooseBelow')"
+                  label="text"
+                  v-model="Data.stateId"
+                ></v-select>
               </div>
             </b-col>
           </b-row>
@@ -139,7 +165,7 @@ import {
   BTr,
   BTd,
 } from "bootstrap-vue";
-import BankService from "../../../services/info/bank.service";
+import EduAreaService from "@/services/info/eduarea.service";
 import ManualService from "../../../services/manual.service";
 import ToastificationContent from "@core/components/toastification/ToastificationContent.vue";
 export default {
@@ -169,8 +195,9 @@ export default {
   data() {
     return {
       show: false,
-      Bank: {},
+      Data: {},
       filter: {},
+      StateList: [],
       TranslateModal: false,
       TranslateFields: [
         {
@@ -202,9 +229,20 @@ export default {
   props: {},
   created() {
     this.lang = localStorage.getItem("locale") || "ru";
-    BankService.Get(this.$route.params.id).then((res) => {
-      this.show = false;
-      this.Bank = res.data;
+    EduAreaService.Get(this.$route.params.id)
+      .then((res) => {
+        this.loading = false;
+        this.Data = res.data;
+        if (this.$route.params.id == 0) {
+          this.Data.stateId = null;
+        }
+      })
+      .catch((error) => {
+        this.makeToast(error.response.data);
+        this.loading = false;
+      });
+    ManualService.StateSelectList().then((res) => {
+      this.StateList = res.data;
     });
     ManualService.LanguageSelectList().then((res) => {
       this.LanguageList = res.data;
@@ -212,23 +250,26 @@ export default {
   },
   methods: {
     check() {
+      var self = this;
       if (
-        this.Bank.bankName === 0 ||
-        this.Bank.bankName === null ||
-        this.Bank.bankName === undefined ||
-        this.Bank.bankName === ""
+        self.Data.code === 0 ||
+        self.Data.code === null ||
+        self.Data.code === undefined ||
+        self.Data.code === ""
       ) {
-        this.makeToast(this.$t("bankNameNotCorrect"), "danger");
+        this.makeToast(this.$t("codeNotCorrect"), 400);
         return false;
       }
-      if (
-        this.Bank.bankCode === 0 ||
-        this.Bank.bankCode === null ||
-        this.Bank.bankCode === undefined ||
-        this.Bank.bankCode === ""
-      ) {
-        this.makeToast(this.$t("bankCodeNotCorrect"), "danger");
-        return false;
+      if (self.Data.id !== 0) {
+        if (
+          self.Data.stateId === 0 ||
+          self.Data.stateId === null ||
+          self.Data.stateId === undefined ||
+          self.Data.stateId === ""
+        ) {
+          this.makeToast(this.$t("stateNotSelect"), 400);
+          return false;
+        }
       }
       return true;
     },
@@ -260,7 +301,7 @@ export default {
         return false;
       }
       if (
-        this.Bank.translates.filter(
+        this.Data.translates.filter(
           (item) =>
             // eslint-disable-next-line implicit-arrow-linebreak
             item.languageId === this.TranslateItem.languageId &&
@@ -270,7 +311,7 @@ export default {
         this.makeToast(this.$t("AlreadySelectLang"), "danger");
         return false;
       }
-      this.Bank.translates.push(this.TranslateItem);
+      this.Data.translates.push(this.TranslateItem);
       this.GetTranslateItems(this.TranslateItem.columnname);
       this.clearLangTable(this.TranslateItem.columnname);
     },
@@ -280,7 +321,7 @@ export default {
       this.clearLangTable(columnname);
     },
     GetTranslateItems(columnname) {
-      this.TranslateItems = this.Bank.translates.filter(
+      this.TranslateItems = this.Data.translates.filter(
         (item) => item.columnname == columnname
       );
     },
@@ -298,10 +339,10 @@ export default {
       if (item.Status === 3) return "d-none";
     },
     SaveData() {
-      BankService.Update(this.Bank)
+      EduAreaService.Update(this.Data)
         .then((res) => {
           this.makeToast(this.$t("SaveSuccess"), "success");
-          this.$router.push({ name: "bank" });
+          this.$router.push({ name: "eduarea" });
         })
         .catch((err) => {
           this.makeToast(this.$t(err), "danger");

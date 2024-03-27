@@ -11,7 +11,7 @@
             <b-button
               style="margin-left: 10px"
               variant="primary"
-              :to="{ name: 'EditCountry', params: { id: 0 } }"
+              :to="{ name: 'EditRegion', params: { id: 0 } }"
             >
               <i class="uil uil-plus"></i> {{ $t("Add") }}
             </b-button>
@@ -65,7 +65,7 @@
               <b-link
                 :id="'tooltip-edit' + item.id"
                 style="margin-right: 5px"
-                :to="{ name: 'EditCountry', params: { id: item.id } }"
+                :to="{ name: 'EditRegion', params: { id: item.id } }"
                 v-b-tooltip.hover.top="$t('edit')"
               >
                 <feather-icon icon="EditIcon"></feather-icon>
@@ -160,7 +160,7 @@
 </template>
 
 <script>
-import CountryService from "@/services/info/country.service";
+import RegionService from "@/services/info/region.service";
 
 import {
   BButton,
@@ -231,8 +231,15 @@ export default {
           sortable: true,
         },
         {
-          key: "textCode",
-          label: this.$t("textCode"),
+          key: "soato",
+          label: this.$t("soato"),
+          thClass: "text-center",
+          tdClass: "text-center",
+          sortable: true,
+        },
+        {
+          key: "roamingCode",
+          label: this.$t("roamingCode"),
           thClass: "text-center",
           tdClass: "text-center",
           sortable: true,
@@ -290,7 +297,7 @@ export default {
     },
     Delete(item) {
       this.DeleteLoading = true;
-      CountryService.Delete(item.id)
+      RegionService.Delete(item.id)
         .then((res) => {
           this.DeleteLoading = false;
           this.Refresh();
@@ -306,12 +313,11 @@ export default {
       this.$bvModal.show("DeleteModal" + item.id);
     },
     Edit(item) {
-      this.$store.state.BankFilter = this.filter;
-      this.$router.push({ path: "/info/country/edit/" + item.id });
+      this.$router.push({ path: "/info/region/edit/" + item.id });
     },
     Refresh() {
       this.isBusy = true;
-      CountryService.GetList(this.filter).then((res) => {
+      RegionService.GetList(this.filter).then((res) => {
         this.Data = res.data.rows;
         this.filter.totalRows = res.data.total;
         this.isBusy = false;

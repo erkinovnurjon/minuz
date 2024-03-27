@@ -120,7 +120,7 @@
               :clearable="false"
               @input="Refresh"
               class="per-page-selector d-inline-block ml-50 mr-1"
-              style="width: 10%; margin-left: 5px"
+              style="margin-left: 5px"
             />
             <span class="text-muted"
               >{{ $t("Showing") }} {{ firstNumber }} {{ $t("to") }}
@@ -161,7 +161,7 @@
 
 <script>
 import BankService from "../../../services/info/bank.service";
-import vSelect from "vue-select";
+
 import {
   BButton,
   BPagination,
@@ -179,11 +179,9 @@ import {
   BInputGroupAppend,
   BLink,
   BModal,
-  BCardText,
 } from "bootstrap-vue";
 export default {
   components: {
-    vSelect,
     BButton,
     BPagination,
     BTable,
@@ -198,7 +196,6 @@ export default {
     BInputGroupAppend,
     BLink,
     BModal,
-    BCardText,
   },
   directives: {
     "b-tooltip": VBTooltip,
@@ -288,20 +285,6 @@ export default {
       this.filter.orderType = data.sortDesc ? "desc" : "asc";
       this.Refresh();
     },
-    // Delete(item) {
-    //   this.DeleteLoading = true;
-    //   BankService.Delete(item.id)
-    //     .then((res) => {
-    //       this.DeleteLoading = false;
-    //       this.$bvModal.hide("DeleteModal" + item.id);
-    //       this.makeToast(this.$t("DeleteSuccess"), 200);
-    //       this.Refresh();
-    //     })
-    //     .catch((error) => {
-    //       this.makeToast(error.response.data);
-    //       this.DeleteLoading = false;
-    //     });
-    // },
     Delete(item) {
       this.DeleteLoading = true;
       BankService.Delete(item.id)

@@ -11,13 +11,23 @@
             <b-button
               style="margin-left: 10px"
               variant="primary"
-              :to="{ name: 'EditCountry', params: { id: 0 } }"
+              :to="{ name: 'Editeduspeciality', params: { id: 0 } }"
             >
               <i class="uil uil-plus"></i> {{ $t("Add") }}
             </b-button>
           </b-col>
-          <b-col md="2"></b-col>
-          <b-col cols="12" md="4">
+          <b-col sm="12" md="3" lg="3">
+            <v-select
+              :options="OrganizationList"
+              :reduce="(item) => item.value"
+              label="text"
+              :placeholder="$t('organization')"
+              v-model="filter.organizationId"
+              @input="Refresh()"
+            >
+            </v-select>
+          </b-col>
+          <b-col cols="12" md="3">
             <b-input-group click="Refresh" class="text-right">
               <b-form-input
                 v-model="filter.search"
@@ -65,7 +75,7 @@
               <b-link
                 :id="'tooltip-edit' + item.id"
                 style="margin-right: 5px"
-                :to="{ name: 'EditCountry', params: { id: item.id } }"
+                :to="{ name: 'Editeduspeciality', params: { id: item.id } }"
                 v-b-tooltip.hover.top="$t('edit')"
               >
                 <feather-icon icon="EditIcon"></feather-icon>
@@ -160,7 +170,8 @@
 </template>
 
 <script>
-import CountryService from "@/services/info/country.service";
+import EduSpecialityService from "@/services/info/eduspeciality.service";
+import OrganizationService from "@/services/managment/organization.service";
 
 import {
   BButton,
@@ -213,6 +224,7 @@ export default {
         perPageOptions: [10, 20, 50, 100],
         totalRows: 0,
       },
+      OrganizationList: [],
       loading: false,
       Data: [],
       fields: [
@@ -224,23 +236,47 @@ export default {
           sortable: true,
         },
         {
-          key: "code",
-          label: this.$t("code"),
+          key: "organization",
+          label: this.$t("organization"),
           thClass: "text-center",
-          tdClass: "text-center",
+          tdClass: "text-left",
           sortable: true,
         },
         {
-          key: "textCode",
-          label: this.$t("textCode"),
+          key: "code",
+          label: this.$t("SpecialtyCode"),
           thClass: "text-center",
           tdClass: "text-center",
           sortable: true,
         },
         {
           key: "fullName",
-          label: this.$t("fullName"),
+          label: this.$t("NameSpecialty"),
+          sortable: true,
+        },
+        {
+          key: "eduAreName",
+          label: this.$t("eduAreaName"),
+          sortable: true,
+        },
+        {
+          key: "faculty",
+          label: this.$t("faculty"),
           thClass: "text-center",
+          tdClass: "text-left",
+          sortable: true,
+        },
+        {
+          key: "eduType",
+          label: this.$t("eduType"),
+          thClass: "text-center",
+          sortable: true,
+        },
+        {
+          key: "eduForm",
+          label: this.$t("eduForm"),
+          thClass: "text-center",
+          tdClass: "text-left",
           sortable: true,
         },
         {
@@ -277,12 +313,16 @@ export default {
     },
   },
   created() {
+    OrganizationService.GetAsSelectList()
+      .then((res) => {
+        this.OrganizationList = res.data;
+      })
+      .catch((error) => {
+        this.makeToast(error.response.data);
+      });
     this.Refresh();
   },
   methods: {
-    EditItem() {
-      this.$store.state.BankFilter = this.filter;
-    },
     SortChange(data) {
       this.filter.sortBy = data.sortBy;
       this.filter.orderType = data.sortDesc ? "desc" : "asc";
@@ -290,7 +330,7 @@ export default {
     },
     Delete(item) {
       this.DeleteLoading = true;
-      CountryService.Delete(item.id)
+      EduSpecialityService.Delete(item.id)
         .then((res) => {
           this.DeleteLoading = false;
           this.Refresh();
@@ -306,12 +346,11 @@ export default {
       this.$bvModal.show("DeleteModal" + item.id);
     },
     Edit(item) {
-      this.$store.state.BankFilter = this.filter;
-      this.$router.push({ path: "/info/country/edit/" + item.id });
+      this.$router.push({ path: "/info/eduspeciality/edit/" + item.id });
     },
     Refresh() {
       this.isBusy = true;
-      CountryService.GetList(this.filter).then((res) => {
+      EduSpecialityService.GetList(this.filter).then((res) => {
         this.Data = res.data.rows;
         this.filter.totalRows = res.data.total;
         this.isBusy = false;

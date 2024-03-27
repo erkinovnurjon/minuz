@@ -11,7 +11,7 @@
             <b-button
               style="margin-left: 10px"
               variant="primary"
-              :to="{ name: 'EditCountry', params: { id: 0 } }"
+              :to="{ name: 'EditIfut', params: { id: 0 } }"
             >
               <i class="uil uil-plus"></i> {{ $t("Add") }}
             </b-button>
@@ -65,7 +65,7 @@
               <b-link
                 :id="'tooltip-edit' + item.id"
                 style="margin-right: 5px"
-                :to="{ name: 'EditCountry', params: { id: item.id } }"
+                :to="{ name: 'EditIfut', params: { id: item.id } }"
                 v-b-tooltip.hover.top="$t('edit')"
               >
                 <feather-icon icon="EditIcon"></feather-icon>
@@ -160,8 +160,7 @@
 </template>
 
 <script>
-import CountryService from "@/services/info/country.service";
-
+import OkedService from "../../../services/info/oked.service";
 import {
   BButton,
   BPagination,
@@ -224,23 +223,17 @@ export default {
           sortable: true,
         },
         {
-          key: "code",
-          label: this.$t("code"),
+          key: "eduYear",
+          label: this.$t("eduYear"),
           thClass: "text-center",
           tdClass: "text-center",
           sortable: true,
         },
         {
-          key: "textCode",
-          label: this.$t("textCode"),
+          key: "details",
+          label: this.$t("Detail"),
           thClass: "text-center",
           tdClass: "text-center",
-          sortable: true,
-        },
-        {
-          key: "fullName",
-          label: this.$t("fullName"),
-          thClass: "text-center",
           sortable: true,
         },
         {
@@ -280,9 +273,6 @@ export default {
     this.Refresh();
   },
   methods: {
-    EditItem() {
-      this.$store.state.BankFilter = this.filter;
-    },
     SortChange(data) {
       this.filter.sortBy = data.sortBy;
       this.filter.orderType = data.sortDesc ? "desc" : "asc";
@@ -290,15 +280,16 @@ export default {
     },
     Delete(item) {
       this.DeleteLoading = true;
-      CountryService.Delete(item.id)
+      OkedService.Delete(item.id)
         .then((res) => {
           this.DeleteLoading = false;
+          this.$bvModal.hide("DeleteModal" + item.id);
+          this.makeToast(this.$t("DeleteSuccess"), 200);
           this.Refresh();
-          this.makeToast(this.$t("DeleteSuccess"), "success");
         })
         .catch((error) => {
+          this.makeToast(error.response.data);
           this.DeleteLoading = false;
-          this.$message(error.response);
         });
     },
 
@@ -306,12 +297,12 @@ export default {
       this.$bvModal.show("DeleteModal" + item.id);
     },
     Edit(item) {
-      this.$store.state.BankFilter = this.filter;
-      this.$router.push({ path: "/info/country/edit/" + item.id });
+      this.$store.state.IfutFilter = this.filter;
+      this.$router.push({ path: "/info/ifut/edit/" + item.id });
     },
     Refresh() {
       this.isBusy = true;
-      CountryService.GetList(this.filter).then((res) => {
+      OkedService.GetList(this.filter).then((res) => {
         this.Data = res.data.rows;
         this.filter.totalRows = res.data.total;
         this.isBusy = false;
