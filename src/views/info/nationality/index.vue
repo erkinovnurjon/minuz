@@ -16,7 +16,6 @@
               <i class="uil uil-plus"></i> {{ $t("Add") }}
             </b-button>
           </b-col>
-          <b-col md="2"></b-col>
           <b-col cols="12" md="4">
             <b-input-group click="Refresh" class="text-right">
               <b-form-input

@@ -419,7 +419,7 @@ export default {
           AccountService.Login(this.login)
             .then((res) => {
               localStorage.setItem("auth_token", res.data.token);
-              localStorage.setItem("user_info", JSON.stringify(res.data.user));
+              localStorage.setItem("user", JSON.stringify(res.data.user));
               this.$router.push({ path: "/" });
               this.$store.dispatch(
                 "auth/setOrganizationtype",
